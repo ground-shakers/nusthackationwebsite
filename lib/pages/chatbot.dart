@@ -1,0 +1,239 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:nusthackationwebsite/pages/dashboard.dart';
+
+class ChatbotPage extends StatefulWidget {
+  const ChatbotPage({super.key});
+
+  @override
+  State<ChatbotPage> createState() => _ChatbotPageState();
+}
+
+class _ChatbotPageState extends State<ChatbotPage> {
+  final TextEditingController _controller = TextEditingController();
+  final List<Map<String, dynamic>> _messages = [];
+  bool _isTyping = false;
+
+  Future<void> _sendMessage(String message) async {
+    if (message.trim().isEmpty) return;
+
+    // Add user message
+    setState(() {
+      _messages.add({'text': message, 'isUser': true});
+      _isTyping = true;
+    });
+
+    _controller.clear();
+
+    try {
+      // Example endpoint (replace with your own)
+      final response = await http.post(
+        Uri.parse('https://your-endpoint.com/chat'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'message': message}),
+      );
+
+      String botMessage = 'Sorry, something went wrong!';
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        botMessage = data['reply'] ?? 'No response';
+      }
+
+      // Add bot message
+      setState(() {
+        _messages.add({'text': botMessage, 'isUser': false});
+        _isTyping = false;
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add({'text': 'Error: $e', 'isUser': false});
+        _isTyping = false;
+      });
+    }
+  }
+
+  Widget _buildMessage(Map<String, dynamic> msg) {
+    return Align(
+      alignment: msg['isUser'] ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        decoration: BoxDecoration(
+          color: msg['isUser'] ? Colors.teal : Colors.grey[300],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          msg['text'],
+          style: TextStyle(
+            color: msg['isUser'] ? Colors.white : Colors.black,
+            fontFamily: 'Clarendon',
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Text(
+                  "MESMTF",
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: Color(0xFF009688),
+                    fontFamily: "BalooPaajiR",
+                  ),
+                ),
+              ),
+              SizedBox(width: 700.w),
+              TextButton(
+                onPressed: () {},
+                child: Column(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Dashboard(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Dashboard",
+                        style: TextStyle(
+                          fontFamily: "Clarendon",
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ChatbotPage(),
+                    ),
+                  );
+                },
+                child: Text(
+                  "Chatbot",
+                  style: TextStyle(
+                    fontFamily: "Clarendon",
+                    fontSize: 16,
+                    color: Color(0xFF009688),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  "About Us",
+                  style: TextStyle(
+                    fontFamily: "Clarendon",
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  "Contact",
+                  style: TextStyle(
+                    fontFamily: "Clarendon",
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: ListView.builder(
+              reverse: true,
+              padding: const EdgeInsets.only(top: 12),
+              itemCount: _messages.length + (_isTyping ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (_isTyping && index == 0) {
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 16,
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Typing...',
+                        style: TextStyle(
+                          fontFamily: 'Clarendon',
+                          color: Colors.black,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                final msg =
+                    _messages[_messages.length -
+                        1 -
+                        index +
+                        (_isTyping ? 0 : 0)];
+                return _buildMessage(msg);
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            color: Colors.white,
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: 'Type a message...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.send, color: Color(0xFF009688)),
+                  onPressed: () => _sendMessage(_controller.text),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

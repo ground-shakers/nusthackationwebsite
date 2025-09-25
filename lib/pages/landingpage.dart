@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nusthackationwebsite/const/animatetime.dart';
 import 'package:nusthackationwebsite/const/textfield.dart';
-import 'package:nusthackationwebsite/pages/signinpage.dart';
+import 'package:nusthackationwebsite/pages/signuppage.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class DesktopHome extends StatefulWidget {
