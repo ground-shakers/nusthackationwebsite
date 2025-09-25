@@ -31,82 +31,76 @@ class _ChatbotPageState extends State<ChatbotPage> {
         child: Column(
           children: [
             // Header
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Logo
-                  Text(
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Text(
                     "MESMTF",
                     style: TextStyle(
-                      fontSize: 24.sp,
-                      color: const Color(0xFF009688),
-                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                      color: Color(0xFF009688),
                       fontFamily: "BalooPaajiR",
                     ),
                   ),
-                  Row(
+                ),
+                SizedBox(width: 700.w),
+                TextButton(
+                  onPressed: () {},
+                  child: Column(
                     children: [
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Services",
-                          style: TextStyle(
-                            fontFamily: "Clarendon",
-                            fontSize: 14.sp,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "About Us",
-                          style: TextStyle(
-                            fontFamily: "Clarendon",
-                            fontSize: 14.sp,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Contact",
-                          style: TextStyle(
-                            fontFamily: "Clarendon",
-                            fontSize: 14.sp,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20.w),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF009688),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 10.h,
-                          ),
-                        ),
-                        onPressed: () {},
-                        child: Text(
-                          "GO TO ACCOUNT",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      Text(
+                        "Dashboard",
+                        style: TextStyle(
+                          fontFamily: "Clarendon",
+                          fontSize: 16,
+                          color: Colors.black,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChatbotPage(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Chatbot",
+                    style: TextStyle(
+                      fontFamily: "Clarendon",
+                      fontSize: 16,
+                      color: Color(0xFF009688),
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "About Us",
+                    style: TextStyle(
+                      fontFamily: "Clarendon",
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Contact",
+                    style: TextStyle(
+                      fontFamily: "Clarendon",
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             // Chat Area
