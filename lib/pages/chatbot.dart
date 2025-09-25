@@ -17,7 +17,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
     setState(() {
       _messages.add({"role": "user", "text": _controller.text.trim()});
-      // For now, just echo a bot response
+      // bot response
       _messages.add({"role": "bot", "text": "This is a bot reply."});
     });
 
