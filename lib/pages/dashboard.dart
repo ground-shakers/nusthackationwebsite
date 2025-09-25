@@ -21,6 +21,7 @@ class _DashboardState extends State<Dashboard> {
           children: [
             // Header
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -33,60 +34,106 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
-                SizedBox(width: 700.w),
-                TextButton(
-                  onPressed: () {},
-                  child: Column(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
                     children: [
-                      Text(
-                        "Dashboard",
-                        style: TextStyle(
-                          fontFamily: "Clarendon",
-                          fontSize: 16,
-                          color: Colors.black,
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Dashboard(),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              "Dashboard",
+                              style: TextStyle(
+                                fontFamily: "Clarendon",
+                                fontSize: 16,
+                                color: Color(0xFF009688),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChatbotPage(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Chatbot",
+                          style: TextStyle(
+                            fontFamily: "Clarendon",
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "About Us",
+                          style: TextStyle(
+                            fontFamily: "Clarendon",
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChatbotPage(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Contact",
+                          style: TextStyle(
+                            fontFamily: "Clarendon",
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xFF009688),
+                              borderRadius: BorderRadius.circular(60),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                              child: Text(
+                                "GO TO ACCOUNT",
+                                style: TextStyle(
+                                  fontFamily: "Clarendon",
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ChatbotPage(),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    "Chatbot",
-                    style: TextStyle(
-                      fontFamily: "Clarendon",
-                      fontSize: 16,
-                      color: Color(0xFF009688),
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "About Us",
-                    style: TextStyle(
-                      fontFamily: "Clarendon",
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "Contact",
-                    style: TextStyle(
-                      fontFamily: "Clarendon",
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
                   ),
                 ),
               ],
