@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+//import 'package:nusthackationwebsite/pages/chatbot.dart';
 import 'package:nusthackationwebsite/pages/dashboard.dart';
-import 'package:nusthackationwebsite/pages/landingpage.dart';
+//import 'package:nusthackationwebsite/pages/dashboard.dart';
+//import 'package:nusthackationwebsite/pages/landingpage.dart';
 
 void main() {
   runApp(const MyApp());

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nusthackationwebsite/pages/chatbot.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -30,7 +31,12 @@ class _DashboardState extends State<Dashboard> {
               ),
               SizedBox(width: 700.w),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChatbotPage()),
+                    );
+                },
                 child: Text(
                   "Chatbot",
                   style: TextStyle(
