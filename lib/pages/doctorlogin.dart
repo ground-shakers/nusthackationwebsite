@@ -2,8 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:nusthackationwebsite/const/textfield.dart';
 import 'package:nusthackationwebsite/models/auth_model.dart';
-import 'package:nusthackationwebsite/pages/dashboard.dart';
-import 'package:nusthackationwebsite/pages/signuppage.dart';
+import 'package:nusthackationwebsite/pages/doctordashboard.dart';
+import 'package:nusthackationwebsite/pages/doctorsignup.dart';
 import 'package:nusthackationwebsite/services/api_service.dart';
 import 'package:nusthackationwebsite/services/storage_service.dart';
 
@@ -61,7 +61,7 @@ class _DoctorloginState extends State<Doctorlogin> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Dashboard()),
+          MaterialPageRoute(builder: (context) => const DoctorDashboardPage()),
         );
       }
     } catch (e) {
@@ -132,7 +132,7 @@ class _DoctorloginState extends State<Doctorlogin> {
                 children: [
                   const SizedBox(height: 40),
                   const Text(
-                    "LOGIN YOUR ACCOUNT",
+                    "LOGIN YOUR DOCTOR'S ACCOUNT",
                     style: TextStyle(
                       fontSize: 26,
                       fontFamily: "MontserratEBold",
@@ -232,7 +232,7 @@ class _DoctorloginState extends State<Doctorlogin> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const Signuppage(),
+                                    builder: (context) => const Doctorsignup(),
                                   ),
                                 );
                               },

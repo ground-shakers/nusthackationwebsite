@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:nusthackationwebsite/pages/doctorsignup.dart';
 import 'package:nusthackationwebsite/pages/signinpage.dart';
 import 'package:nusthackationwebsite/pages/signuppage.dart';
 
@@ -106,7 +107,14 @@ class Accounttype extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Doctorsignup(),
+                        ),
+                      );
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: const Color(0xFF009688),

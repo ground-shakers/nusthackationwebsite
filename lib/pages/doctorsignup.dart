@@ -1,12 +1,14 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:nusthackationwebsite/const/textfield.dart';
-import 'package:nusthackationwebsite/models/auth_model.dart';
-import 'package:nusthackationwebsite/models/patient_model.dart';
-import 'package:nusthackationwebsite/pages/dashboard.dart';
-import 'package:nusthackationwebsite/services/api_service.dart';
-import 'package:nusthackationwebsite/pages/signinpage.dart';
-import 'package:nusthackationwebsite/services/storage_service.dart';
+import 'package:nusthackationwebsite/models/doctors_model.dart';
+import 'package:nusthackationwebsite/pages/doctordashboard.dart';
+import 'package:nusthackationwebsite/pages/doctorlogin.dart';
+import 'package:nusthackationwebsite/services/doctor_api_service.dart';
+import 'package:nusthackationwebsite/services/doctor_storage_service.dart';
 
 class Doctorsignup extends StatefulWidget {
   const Doctorsignup({super.key});
@@ -16,37 +18,54 @@ class Doctorsignup extends StatefulWidget {
 }
 
 class _DoctorsignupState extends State<Doctorsignup> {
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController retypepasswordController =
+  // Personal Information Controllers
+  final TextEditingController doctorFirstNameController =
       TextEditingController();
-  final TextEditingController dobController = TextEditingController();
-  final TextEditingController genderController = TextEditingController();
+  final TextEditingController doctorLastNameController =
+      TextEditingController();
+  final TextEditingController doctorEmailController = TextEditingController();
+  final TextEditingController doctorPhoneController = TextEditingController();
+  final TextEditingController doctorPasswordController =
+      TextEditingController();
+  final TextEditingController doctorRetypePasswordController =
+      TextEditingController();
+  final TextEditingController doctorDobController = TextEditingController();
+  final TextEditingController doctorGenderController = TextEditingController();
+
+  // Professional Information Controllers
+  final TextEditingController doctorIdNumberController =
+      TextEditingController();
+  final TextEditingController doctorSpecialtyController =
+      TextEditingController();
+  final TextEditingController doctorYearsExperienceController =
+      TextEditingController();
+  final TextEditingController doctorMedicalFacilityController =
+      TextEditingController();
 
   bool _isLoading = false;
   String _errorMessage = '';
 
-  bool get passwordsMatch {
-    return passwordController.text == retypepasswordController.text;
+  bool get doctorPasswordsMatch {
+    return doctorPasswordController.text == doctorRetypePasswordController.text;
   }
 
-  bool get isFormValid {
-    return firstNameController.text.isNotEmpty &&
-        lastNameController.text.isNotEmpty &&
-        emailController.text.isNotEmpty &&
-        phoneController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty &&
-        retypepasswordController.text.isNotEmpty &&
-        genderController.text.isNotEmpty &&
-        dobController.text.isNotEmpty &&
-        passwordsMatch;
+  bool get isDoctorFormValid {
+    return doctorFirstNameController.text.isNotEmpty &&
+        doctorLastNameController.text.isNotEmpty &&
+        doctorEmailController.text.isNotEmpty &&
+        doctorPhoneController.text.isNotEmpty &&
+        doctorPasswordController.text.isNotEmpty &&
+        doctorRetypePasswordController.text.isNotEmpty &&
+        doctorGenderController.text.isNotEmpty &&
+        doctorDobController.text.isNotEmpty &&
+        doctorIdNumberController.text.isNotEmpty &&
+        doctorSpecialtyController.text.isNotEmpty &&
+        doctorYearsExperienceController.text.isNotEmpty &&
+        doctorMedicalFacilityController.text.isNotEmpty &&
+        doctorPasswordsMatch;
   }
 
-  // Parse date from "DD/MM/YYYY" format
-  (int, int, int)? _parseDate(String dateString) {
+  (int, int, int)? _parseDoctorDate(String dateString) {
     try {
       final parts = dateString.split('/');
       if (parts.length == 3) {
@@ -61,25 +80,42 @@ class _DoctorsignupState extends State<Doctorsignup> {
     return null;
   }
 
-  Future<void> _signUp() async {
-    if (!isFormValid) {
+  Future<void> _doctorSignUp() async {
+    if (!isDoctorFormValid) {
       setState(() {
         _errorMessage = 'Please fill all fields correctly';
       });
       return;
     }
 
-    if (!passwordsMatch) {
+    if (!doctorPasswordsMatch) {
       setState(() {
         _errorMessage = 'Passwords do not match';
       });
       return;
     }
 
-    final dateParts = _parseDate(dobController.text);
+    final dateParts = _parseDoctorDate(doctorDobController.text);
     if (dateParts == null) {
       setState(() {
         _errorMessage = 'Please enter date in DD/MM/YYYY format';
+      });
+      return;
+    }
+
+    // Validate years of experience
+    int? doctorYearsOfExperience;
+    try {
+      doctorYearsOfExperience = int.parse(doctorYearsExperienceController.text);
+      if (doctorYearsOfExperience < 0) {
+        setState(() {
+          _errorMessage = 'Years of experience cannot be negative';
+        });
+        return;
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Please enter a valid number for years of experience';
       });
       return;
     }
@@ -90,60 +126,89 @@ class _DoctorsignupState extends State<Doctorsignup> {
     });
 
     try {
-      // 1. Create the PatientSignupRequest object
-      final request = PatientSignupRequest(
-        contactInfo: ContactInfo(
-          email: emailController.text,
-          phone: phoneController.text,
+      // --- Create the DoctorSignupRequest object ---
+      final doctorRequest = DoctorSignupRequest(
+        contactInfo: DoctorContactInfo(
+          email: doctorEmailController.text,
+          phone: doctorPhoneController.text,
         ),
-        password: passwordController.text,
-        verifyPassword: retypepasswordController.text,
-        firstName: firstNameController.text,
-        lastName: lastNameController.text,
-        gender: genderController.text,
-        birthDetails: BirthDetails(
+        password: doctorPasswordController.text,
+        verifyPassword: doctorRetypePasswordController.text,
+        firstName: doctorFirstNameController.text,
+        lastName: doctorLastNameController.text,
+        gender: doctorGenderController.text,
+        birthDetails: DoctorBirthDetails(
           day: dateParts.$1,
           month: dateParts.$2,
           year: dateParts.$3,
         ),
+        idNumber: doctorIdNumberController.text,
+        specialty: doctorSpecialtyController.text
+            .split(',')
+            .map((s) => s.trim())
+            .toList(),
+        yearsOfExperience: doctorYearsOfExperience,
+        medicalFacility: doctorMedicalFacilityController.text,
       );
 
-      // 2. Create account
-      final signupResponse = await ApiService.createPatient(request);
-      print('✅ Account created: ${signupResponse.message}');
+      // --- Create doctor account ---
+      final doctorSignupResponse = await DoctorApiService.createDoctor(
+        doctorRequest,
+      );
+      print('✅ Doctor account created: ${doctorSignupResponse.message}');
 
-      // 3. Auto-login with the same credentials
-      final loginRequest = LoginRequest(
-        username: emailController.text,
-        password: passwordController.text,
+      // --- Auto-login as form data ---
+      print('🔄 Attempting doctor auto-login...');
+
+      final loginBody = {
+        'username': doctorEmailController.text,
+        'password': doctorPasswordController.text,
+      };
+      print('📤 Sending doctor login request as form data: $loginBody');
+
+      final response = await http.post(
+        Uri.parse('https://ground-shakers.xyz/login'),
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: loginBody,
       );
 
-      print('🔄 Attempting auto-login...');
-      final loginResponse = await ApiService.login(loginRequest);
+      print('📥 Response code: ${response.statusCode}');
+      print('📥 Response body: ${response.body}');
 
-      // 4. Store the token and user data
-      await StorageService.saveLoginData(loginResponse);
+      if (response.statusCode != 200) {
+        throw Exception('Doctor login failed: ${response.body}');
+      }
 
-      // 5. Verify storage worked
-      final userData = await StorageService.getUserData();
-      print('💾 Stored user data: $userData');
+      final responseData = jsonDecode(response.body);
 
-      // 6. Show success and navigate to dashboard
+      // --- Store the doctor token and user data ---
+      await DoctorStorageService.saveDoctorLoginData(responseData);
+
+      // Store doctor profile
+      await DoctorStorageService.saveDoctorProfile(doctorSignupResponse.doctor);
+
+      // Verify storage worked
+      final doctorUserData = await DoctorStorageService.getDoctorUserData();
+      final doctorProfile = await DoctorStorageService.getDoctorProfile();
+      print('💾 Stored doctor user data: $doctorUserData');
+      print('💾 Stored doctor profile: $doctorProfile');
+
+      // Show success and navigate to dashboard
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Welcome! Login successful.'),
+            content: Text('Welcome Doctor! Account created successfully.'),
             backgroundColor: Colors.green,
           ),
         );
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Dashboard()),
+          MaterialPageRoute(builder: (context) => const DoctorDashboardPage()),
         );
       }
     } catch (e) {
-      print('❌ Signup/login failed: $e');
+      print('❌ Doctor signup/login failed: $e');
       setState(() {
         _errorMessage = e.toString().replaceAll('Exception: ', '');
       });
@@ -216,7 +281,7 @@ class _DoctorsignupState extends State<Doctorsignup> {
                   children: [
                     const SizedBox(height: 10),
                     Text(
-                      "CREATE AN ACCOUNT",
+                      "CREATE A DOCTOR ACCOUNT",
                       style: TextStyle(
                         fontSize: isMobile ? 22 : 26,
                         fontFamily: "MontserratEBold",
@@ -243,11 +308,14 @@ class _DoctorsignupState extends State<Doctorsignup> {
 
                     const SizedBox(height: 10),
 
-                    if (isMobile) _buildMobileForm() else _buildDesktopForm(),
+                    if (isMobile)
+                      _buildDoctorMobileForm()
+                    else
+                      _buildDoctorDesktopForm(),
 
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: _isLoading ? null : _signUp,
+                      onTap: _isLoading ? null : _doctorSignUp,
                       child: Container(
                         decoration: BoxDecoration(
                           color: _isLoading
@@ -278,7 +346,7 @@ class _DoctorsignupState extends State<Doctorsignup> {
                                   ),
                                 )
                               : Text(
-                                  "SIGN UP",
+                                  "SIGN UP AS DOCTOR",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontFamily: "Clarendon",
@@ -294,7 +362,7 @@ class _DoctorsignupState extends State<Doctorsignup> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          "Already have an account? ",
+                          "Already have a doctor account? ",
                           style: TextStyle(
                             fontSize: isMobile ? 11 : 12,
                             fontFamily: "MontserratEBold",
@@ -309,12 +377,12 @@ class _DoctorsignupState extends State<Doctorsignup> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const Signinpage(),
+                                      builder: (context) => const Doctorlogin(),
                                     ),
                                   );
                                 },
                           child: Text(
-                            " Log In",
+                            " Doctor Log In",
                             style: TextStyle(
                               fontSize: isMobile ? 11 : 12,
                               fontFamily: "MontserratEBold",
@@ -337,19 +405,30 @@ class _DoctorsignupState extends State<Doctorsignup> {
     );
   }
 
-  Widget _buildDesktopForm() {
+  Widget _buildDoctorDesktopForm() {
     return Column(
       children: [
+        Text(
+          "Personal Information",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            fontFamily: "MontserratEBold",
+            color: const Color(0xFF009688),
+          ),
+        ),
+        const SizedBox(height: 10),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             UserNameField(
-              controller: firstNameController,
+              controller: doctorFirstNameController,
               hintText: "First Name",
             ),
             const SizedBox(width: 20),
             UserNameField(
-              controller: lastNameController,
+              controller: doctorLastNameController,
               hintText: "Last Name",
             ),
           ],
@@ -359,12 +438,12 @@ class _DoctorsignupState extends State<Doctorsignup> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             UserNameField(
-              controller: emailController,
+              controller: doctorEmailController,
               hintText: "Email Address",
             ),
             const SizedBox(width: 20),
             UserNameField(
-              controller: phoneController,
+              controller: doctorPhoneController,
               hintText: "Phone Number",
             ),
           ],
@@ -374,14 +453,14 @@ class _DoctorsignupState extends State<Doctorsignup> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             PasswordTextField(
-              controller: passwordController,
+              controller: doctorPasswordController,
               hintText: "Password",
             ),
             const SizedBox(width: 20),
             PasswordTextField(
-              controller: retypepasswordController,
+              controller: doctorRetypePasswordController,
               hintText: "Retype Password",
-              doesMatch: passwordsMatch,
+              doesMatch: doctorPasswordsMatch,
             ),
           ],
         ),
@@ -393,61 +472,165 @@ class _DoctorsignupState extends State<Doctorsignup> {
               width: 280,
               child: CustomDropdown(
                 options: const ["Male", "Female", "Other"],
-                controller: genderController,
+                controller: doctorGenderController,
                 hintText: "Gender",
               ),
             ),
             const SizedBox(width: 20),
-            DateOfBirthField(controller: dobController),
+            DateOfBirthField(controller: doctorDobController),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+        Text(
+          "Professional Information",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            fontFamily: "MontserratEBold",
+            color: const Color(0xFF009688),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            UserNameField(
+              controller: doctorIdNumberController,
+              hintText: "Medical ID Number",
+            ),
+            const SizedBox(width: 20),
+            UserNameField(
+              controller: doctorSpecialtyController,
+              hintText: "Specialty (comma separated)",
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            UserNameField(
+              controller: doctorYearsExperienceController,
+              hintText: "Years of Experience",
+            ),
+            const SizedBox(width: 20),
+            UserNameField(
+              controller: doctorMedicalFacilityController,
+              hintText: "Medical Facility/Hospital",
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildMobileForm() {
+  Widget _buildDoctorMobileForm() {
     return Column(
       children: [
-        UserNameField(controller: firstNameController, hintText: "First Name"),
+        // Personal Information Section
+        Text(
+          "Personal Information",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF009688),
+          ),
+        ),
         const SizedBox(height: 10),
-        UserNameField(controller: lastNameController, hintText: "Last Name"),
+
+        UserNameField(
+          controller: doctorFirstNameController,
+          hintText: "First Name",
+        ),
         const SizedBox(height: 10),
-        UserNameField(controller: emailController, hintText: "Email Address"),
+        UserNameField(
+          controller: doctorLastNameController,
+          hintText: "Last Name",
+        ),
         const SizedBox(height: 10),
-        UserNameField(controller: phoneController, hintText: "Phone Number"),
+        UserNameField(
+          controller: doctorEmailController,
+          hintText: "Email Address",
+        ),
         const SizedBox(height: 10),
-        PasswordTextField(controller: passwordController, hintText: "Password"),
+        UserNameField(
+          controller: doctorPhoneController,
+          hintText: "Phone Number",
+        ),
         const SizedBox(height: 10),
         PasswordTextField(
-          controller: retypepasswordController,
+          controller: doctorPasswordController,
+          hintText: "Password",
+        ),
+        const SizedBox(height: 10),
+        PasswordTextField(
+          controller: doctorRetypePasswordController,
           hintText: "Retype Password",
-          doesMatch: passwordsMatch,
+          doesMatch: doctorPasswordsMatch,
         ),
         const SizedBox(height: 10),
         SizedBox(
           width: 280,
           child: CustomDropdown(
             options: const ["Male", "Female", "Other"],
-            controller: genderController,
+            controller: doctorGenderController,
             hintText: "Gender",
           ),
         ),
         const SizedBox(height: 10),
-        DateOfBirthField(controller: dobController),
+        DateOfBirthField(controller: doctorDobController),
+
+        // Professional Information Section
+        const SizedBox(height: 20),
+        Text(
+          "Professional Information",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF009688),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        UserNameField(
+          controller: doctorIdNumberController,
+          hintText: "Medical ID Number",
+        ),
+        const SizedBox(height: 10),
+        UserNameField(
+          controller: doctorSpecialtyController,
+          hintText: "Specialty (comma separated)",
+        ),
+        const SizedBox(height: 10),
+        UserNameField(
+          controller: doctorYearsExperienceController,
+          hintText: "Years of Experience",
+        ),
+        const SizedBox(height: 10),
+        UserNameField(
+          controller: doctorMedicalFacilityController,
+          hintText: "Medical Facility/Hospital",
+        ),
       ],
     );
   }
 
   @override
   void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    passwordController.dispose();
-    retypepasswordController.dispose();
-    dobController.dispose();
-    genderController.dispose();
+    doctorFirstNameController.dispose();
+    doctorLastNameController.dispose();
+    doctorEmailController.dispose();
+    doctorPhoneController.dispose();
+    doctorPasswordController.dispose();
+    doctorRetypePasswordController.dispose();
+    doctorDobController.dispose();
+    doctorGenderController.dispose();
+    doctorIdNumberController.dispose();
+    doctorSpecialtyController.dispose();
+    doctorYearsExperienceController.dispose();
+    doctorMedicalFacilityController.dispose();
     super.dispose();
   }
 }

@@ -105,4 +105,37 @@ class ApiService {
       throw Exception('Network error: $e');
     }
   }
+
+  static Future<PatientSignupResponse> createDoctor(
+    PatientSignupRequest request,
+  ) async {
+    final url = Uri.parse('$baseUrl/api/v1/doctors');
+
+    try {
+      final requestBody = request.toJson();
+      final jsonString = json.encode(requestBody);
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonString,
+      );
+
+      if (response.statusCode == 201) {
+        final jsonResponse = json.decode(response.body);
+        return PatientSignupResponse.fromJson(jsonResponse);
+      } else if (response.statusCode == 422) {
+        final errorJson = json.decode(response.body);
+        throw Exception('Validation error: ${errorJson['detail']}');
+      } else if (response.statusCode == 500) {
+        throw Exception('Server error (500). Response: ${response.body}');
+      } else {
+        throw Exception(
+          'Failed to create account. Status code: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Network error: $e');
+    }
+  }
 }
