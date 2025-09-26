@@ -1,8 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:nusthackationwebsite/const/textfield.dart';
+import 'package:nusthackationwebsite/models/auth_model.dart';
+import 'package:nusthackationwebsite/models/patient_model.dart';
+import 'package:nusthackationwebsite/pages/dashboard.dart';
+import 'package:nusthackationwebsite/services/api_service.dart';
 import 'package:nusthackationwebsite/pages/codepage.dart';
 import 'package:nusthackationwebsite/pages/signinpage.dart';
+import 'package:nusthackationwebsite/services/storage_service.dart';
 
 class Signuppage extends StatefulWidget {
   const Signuppage({super.key});
@@ -15,19 +20,162 @@ class _SignuppageState extends State<Signuppage> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController retypepasswordController =
       TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
 
+  bool _isLoading = false;
+  String _errorMessage = '';
+
   bool get passwordsMatch {
     return passwordController.text == retypepasswordController.text;
   }
 
+  bool get isFormValid {
+    return firstNameController.text.isNotEmpty &&
+        lastNameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        phoneController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty &&
+        retypepasswordController.text.isNotEmpty &&
+        genderController.text.isNotEmpty &&
+        dobController.text.isNotEmpty &&
+        passwordsMatch;
+  }
+
+  // Parse date from "DD/MM/YYYY" format
+  (int, int, int)? _parseDate(String dateString) {
+    try {
+      final parts = dateString.split('/');
+      if (parts.length == 3) {
+        final day = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        final year = int.parse(parts[2]);
+        return (day, month, year);
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  Future<void> _signUp() async {
+    if (!isFormValid) {
+      setState(() {
+        _errorMessage = 'Please fill all fields correctly';
+      });
+      return;
+    }
+
+    if (!passwordsMatch) {
+      setState(() {
+        _errorMessage = 'Passwords do not match';
+      });
+      return;
+    }
+
+    final dateParts = _parseDate(dobController.text);
+    if (dateParts == null) {
+      setState(() {
+        _errorMessage = 'Please enter date in DD/MM/YYYY format';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      // 1. Create the PatientSignupRequest object first
+      final request = PatientSignupRequest(
+        contactInfo: ContactInfo(
+          email: emailController.text,
+          phone: phoneController.text,
+        ),
+        password: passwordController.text,
+        verifyPassword: retypepasswordController.text,
+        firstName: firstNameController.text,
+        lastName: lastNameController.text,
+        gender: genderController.text,
+        birthDetails: BirthDetails(
+          day: dateParts.$1,
+          month: dateParts.$2,
+          year: dateParts.$3,
+        ),
+      );
+
+      // 2. Now use the request object
+      final signupResponse = await ApiService.createPatient(request);
+      print('✅ Account created: ${signupResponse.message}');
+
+      // 3. Auto-login with the same credentials
+      final loginRequest = LoginRequest(
+        username: emailController.text, // Usually username is email
+        password: passwordController.text,
+      );
+
+      print('🔄 Attempting auto-login...');
+      final loginResponse = await ApiService.login(loginRequest);
+
+      // 4. Store the token and user data
+      await StorageService.saveLoginData(loginResponse);
+
+      // 5. Show success and navigate to dashboard
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome! Login successful.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Dashboard()),
+        );
+      }
+    } catch (e) {
+      print('❌ Signup/login failed: $e');
+
+      // If login fails but signup succeeded, still show success but go to login page
+      if (e.toString().contains('Login failed')) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Account created! Please login manually.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Signinpage()),
+          );
+        }
+      } else {
+        setState(() {
+          _errorMessage = e.toString().replaceAll('Exception: ', '');
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -38,19 +186,19 @@ class _SignuppageState extends State<Signuppage> {
                 'assets/images/doctors.png',
                 width: double.infinity,
                 height: double.infinity,
-                alignment: Alignment(0, -0.3),
+                alignment: const Alignment(0, -0.3),
                 fit: BoxFit.cover,
               ),
               Image.asset(
                 'assets/images/doctors2.png',
                 width: double.infinity,
                 height: double.infinity,
-                alignment: Alignment(0, -0.5),
+                alignment: const Alignment(0, -0.5),
                 fit: BoxFit.cover,
               ),
               Image.asset(
                 'assets/images/doctors3.png',
-                alignment: Alignment(0, -0.2),
+                alignment: const Alignment(0, -0.2),
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,
@@ -68,162 +216,264 @@ class _SignuppageState extends State<Signuppage> {
 
           // Container
           Center(
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              width: 900,
-              height: 440,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height: 10),
-                  const Text(
-                    "CREATE AN ACCOUNT",
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontFamily: "MontserratEBold",
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF009688),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                width: isMobile ? double.infinity : 900,
+                constraints: BoxConstraints(maxWidth: isMobile ? 500 : 900),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      "CREATE AN ACCOUNT",
+                      style: TextStyle(
+                        fontSize: isMobile ? 22 : 26,
+                        fontFamily: "MontserratEBold",
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF009688),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      UserNameField(
-                        controller: firstNameController,
-                        hintText: "First Name",
-                      ),
-                      SizedBox(width: 20),
-                      UserNameField(
-                        controller: lastNameController,
-                        hintText: "Last Name",
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      UserNameField(
-                        controller: usernameController,
-                        hintText: "Username",
-                      ),
-                      SizedBox(width: 20),
-                      EmailTextField(
-                        controller: emailController,
-                        hintText: "Email Address",
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      PasswordTextField(
-                        controller: passwordController,
-                        hintText: "Password",
-                      ),
-                      SizedBox(width: 20),
-                      PasswordTextField(
-                        controller: retypepasswordController,
-                        hintText: "Retype Password",
-                        doesMatch: passwordsMatch,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomDropdown(
-                        options: ["Male", "Female", "Other"],
-                        controller: genderController,
-                        hintText: "Gender",
-                      ),
-                      SizedBox(width: 20),
-                      DateOfBirthField(controller: dobController),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Codepage(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Color(0xFF009688),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: const Color(0xFF009688),
-                          width: 2,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 10,
-                        ),
+
+                    // Error message
+                    if (_errorMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Text(
-                          "SIGN UP",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: "Clarendon",
-                            fontSize: 12,
+                          _errorMessage,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+
+                    const SizedBox(height: 10),
+
+                    if (isMobile) _buildMobileForm() else _buildDesktopForm(),
+
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: _isLoading ? null : _signUp,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: _isLoading
+                              ? Colors.grey
+                              : const Color(0xFF009688),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: _isLoading
+                                ? Colors.grey
+                                : const Color(0xFF009688),
+                            width: 2,
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Already have an account? ",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: "MontserratEBold",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 20 : 30,
+                            vertical: isMobile ? 12 : 10,
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  "SIGN UP",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Clarendon",
+                                    fontSize: isMobile ? 11 : 12,
+                                  ),
+                                ),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Signinpage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          " Log In",
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Already have an account? ",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: isMobile ? 11 : 12,
                             fontFamily: "MontserratEBold",
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF009688),
+                            color: Colors.black,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        GestureDetector(
+                          onTap: _isLoading
+                              ? null
+                              : () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Signinpage(),
+                                    ),
+                                  );
+                                },
+                          child: Text(
+                            " Log In",
+                            style: TextStyle(
+                              fontSize: isMobile ? 11 : 12,
+                              fontFamily: "MontserratEBold",
+                              fontWeight: FontWeight.bold,
+                              color: _isLoading
+                                  ? Colors.grey
+                                  : const Color(0xFF009688),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildDesktopForm() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: UserNameField(
+                controller: firstNameController,
+                hintText: "First Name",
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: UserNameField(
+                controller: lastNameController,
+                hintText: "Last Name",
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: UserNameField(
+                controller: emailController,
+                hintText: "Email Address",
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: UserNameField(
+                controller: phoneController,
+                hintText: "Phone Number",
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: PasswordTextField(
+                controller: passwordController,
+                hintText: "Password",
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: PasswordTextField(
+                controller: retypepasswordController,
+                hintText: "Retype Password",
+                doesMatch: passwordsMatch,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: CustomDropdown(
+                options: const ["Male", "Female", "Other"],
+                controller: genderController,
+                hintText: "Gender",
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(child: DateOfBirthField(controller: dobController)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileForm() {
+    return Column(
+      children: [
+        UserNameField(controller: firstNameController, hintText: "First Name"),
+        const SizedBox(height: 10),
+        UserNameField(controller: lastNameController, hintText: "Last Name"),
+        const SizedBox(height: 10),
+        UserNameField(controller: emailController, hintText: "Email Address"),
+        const SizedBox(height: 10),
+        UserNameField(controller: phoneController, hintText: "Phone Number"),
+        const SizedBox(height: 10),
+        PasswordTextField(controller: passwordController, hintText: "Password"),
+        const SizedBox(height: 10),
+        PasswordTextField(
+          controller: retypepasswordController,
+          hintText: "Retype Password",
+          doesMatch: passwordsMatch,
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: 280,
+          child: CustomDropdown(
+            options: const ["Male", "Female", "Other"],
+            controller: genderController,
+            hintText: "Gender",
+          ),
+        ),
+        const SizedBox(height: 10),
+        DateOfBirthField(controller: dobController),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    retypepasswordController.dispose();
+    dobController.dispose();
+    genderController.dispose();
+    super.dispose();
   }
 }
