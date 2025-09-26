@@ -91,7 +91,7 @@ class _SignuppageState extends State<Signuppage> {
     });
 
     try {
-      // 1. Create the PatientSignupRequest object first
+      // 1. Create the PatientSignupRequest object
       final request = PatientSignupRequest(
         contactInfo: ContactInfo(
           email: emailController.text,
@@ -109,13 +109,13 @@ class _SignuppageState extends State<Signuppage> {
         ),
       );
 
-      // 2. Now use the request object
+      // 2. Create account
       final signupResponse = await ApiService.createPatient(request);
       print('✅ Account created: ${signupResponse.message}');
 
       // 3. Auto-login with the same credentials
       final loginRequest = LoginRequest(
-        username: emailController.text, // Usually username is email
+        username: emailController.text,
         password: passwordController.text,
       );
 
@@ -125,7 +125,11 @@ class _SignuppageState extends State<Signuppage> {
       // 4. Store the token and user data
       await StorageService.saveLoginData(loginResponse);
 
-      // 5. Show success and navigate to dashboard
+      // 5. Verify storage worked
+      final userData = await StorageService.getUserData();
+      print('💾 Stored user data: $userData');
+
+      // 6. Show success and navigate to dashboard
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -141,27 +145,9 @@ class _SignuppageState extends State<Signuppage> {
       }
     } catch (e) {
       print('❌ Signup/login failed: $e');
-
-      // If login fails but signup succeeded, still show success but go to login page
-      if (e.toString().contains('Login failed')) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Account created! Please login manually.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Signinpage()),
-          );
-        }
-      } else {
-        setState(() {
-          _errorMessage = e.toString().replaceAll('Exception: ', '');
-        });
-      }
+      setState(() {
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
+      });
     } finally {
       if (mounted) {
         setState(() {

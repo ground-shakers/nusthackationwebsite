@@ -6,25 +6,67 @@ import '../models/patient_model.dart';
 class ApiService {
   static const String baseUrl = 'https://ground-shakers.xyz';
 
-  static Future<LoginResponse> login(LoginRequest request) async {
-    final url = Uri.parse('$baseUrl/login'); // Adjust endpoint if needed
+  static Future<Patient> getPatientProfile(
+    String patientId,
+    String accessToken,
+  ) async {
+    final url = Uri.parse('$baseUrl/api/v1/patients/$patientId');
 
     try {
-      final requestBody = json.encode(request.toJson());
-      print('🔐 === LOGIN REQUEST ===');
+      print('👤 === FETCH PATIENT PROFILE ===');
       print('URL: $url');
-      print('Body: $requestBody');
-      print('=====================');
+      print('Patient ID: $patientId');
+      print('========================');
 
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print('👤 === PATIENT PROFILE RESPONSE ===');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      print('========================');
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return Patient.fromJson(
+          jsonResponse['patient'],
+        ); // Extract patient object from response
+      } else {
+        throw Exception(
+          'Failed to fetch patient profile: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('❌ Patient profile fetch error: $e');
+      throw Exception('Patient profile fetch error: $e');
+    }
+  }
+
+  static Future<LoginResponse> login(LoginRequest request) async {
+    final url = Uri.parse('$baseUrl/login');
+
+    try {
+      print('🔐 === LOGIN REQUEST (FORM DATA) ===');
+      print('URL: $url');
+      print('Username: ${request.username}');
+      print('Password: ${request.password}');
+      print('========================');
+
+      // Send as form data - use a Map for the body
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
-        body: requestBody,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {'username': request.username, 'password': request.password},
       );
 
       print('🔐 === LOGIN RESPONSE ===');
       print('Status Code: ${response.statusCode}');
-      print('Response: ${response.body}');
+      print('Response Body: ${response.body}');
       print('========================');
 
       if (response.statusCode == 200) {

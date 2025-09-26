@@ -36,23 +36,27 @@ class _SigninpageState extends State<Signinpage> {
     });
 
     try {
+      // 1. Create login request (NOT signup!)
       final loginRequest = LoginRequest(
         username: emailController.text,
         password: passwordController.text,
       );
 
-      print('📧 Email controller text: "${emailController.text}"');
-      print('🔐 Password controller text: "${passwordController.text}"');
-      print('📦 LoginRequest object: $loginRequest');
-      print('📋 LoginRequest toJson(): ${loginRequest.toJson()}');
+      print('🔐 Attempting login...');
+      print('📧 Email: ${emailController.text}');
+      print('🔐 Password: ${passwordController.text}');
 
-      final jsonString = json.encode(loginRequest.toJson());
-      print('📨 Raw JSON string being sent: $jsonString');
-      print('📏 JSON string length: ${jsonString.length}');
-
+      // 2. Call the LOGIN API (not createPatient!)
       final loginResponse = await ApiService.login(loginRequest);
+
+      // 3. Store the token and user data
       await StorageService.saveLoginData(loginResponse);
 
+      // 4. Verify storage worked
+      final userData = await StorageService.getUserData();
+      print('💾 Stored user data: $userData');
+
+      // 5. Show success and navigate to dashboard
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -67,7 +71,7 @@ class _SigninpageState extends State<Signinpage> {
         );
       }
     } catch (e) {
-      print('❌ Full error details: $e');
+      print('❌ Login failed: $e');
       setState(() {
         _errorMessage = e.toString().replaceAll('Exception: ', '');
       });

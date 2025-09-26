@@ -5,10 +5,13 @@ class LoginRequest {
   LoginRequest({required this.username, required this.password});
 
   Map<String, dynamic> toJson() {
-    return {
-      'username': username, // Directly at root level
-      'password': password, // Directly at root level
-    };
+    return {'username': username, 'password': password};
+  }
+
+  // Add a proper toString method for debugging
+  @override
+  String toString() {
+    return 'LoginRequest{username: $username, password: $password}';
   }
 }
 
@@ -29,7 +32,7 @@ class LoginResponse {
     return LoginResponse(
       message: json['message'] ?? '',
       token: Token.fromJson(json['token'] ?? {}),
-      userId: json['user_id'] ?? '',
+      userId: json['user_id'] ?? '', // Note: 'user_id' not 'userId'
       role: json['role'] ?? '',
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nusthackationwebsite/authchecker.dart';
 import 'package:nusthackationwebsite/pages/landingpage.dart';
 
 void main() {
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Medical Expert System for Malaria & Typhoid Fever',
           theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-          home: const DesktopHome(),
+          home: const AuthWrapper(),
           restorationScopeId: 'app',
         );
       },

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:nusthackationwebsite/pages/contactus.dart';
+import 'package:nusthackationwebsite/pages/dashboard.dart';
 
 class ChatbotPage extends StatefulWidget {
   const ChatbotPage({super.key});
