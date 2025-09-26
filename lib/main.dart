@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Medical Expert System for Malaria & Typhoid Fever',
           theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-          home: const ChatbotPage(),
+          home: const AuthWrapper(),
           restorationScopeId: 'app',
         );
       },
