@@ -1,14 +1,17 @@
-// ignore_for_file: deprecated_member_use
-
+import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:nusthackationwebsite/const/textfield.dart';
 import 'package:nusthackationwebsite/pages/dashboard.dart';
-import 'package:nusthackationwebsite/pages/signuppage.dart';
 
-class Signinpage extends StatelessWidget {
-  const Signinpage({super.key});
+class Codepage extends StatefulWidget {
+  const Codepage({super.key});
 
+  @override
+  State<Codepage> createState() => _CodepageState();
+}
+
+class _CodepageState extends State<Codepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +67,7 @@ class Signinpage extends StatelessWidget {
                 children: [
                   SizedBox(height: 60),
                   const Text(
-                    "LOGIN YOUR ACCOUNT",
+                    "ENTER YOUR CODE",
                     style: TextStyle(
                       fontSize: 26,
                       fontFamily: "MontserratEBold",
@@ -73,19 +76,13 @@ class Signinpage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  EmailTextField(
+                  UserNameField(
                     controller: TextEditingController(),
-                    hintText: "Email Address",
-                  ),
-                  const SizedBox(height: 6),
-                  PasswordTextField(
-                    controller: TextEditingController(),
-                    hintText: "Password",
+                    hintText: "00000",
                   ),
                   const SizedBox(height: 40),
                   GestureDetector(
                     onTap: () {
-                      // Navigate to the dashboard page
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -93,36 +90,26 @@ class Signinpage extends StatelessWidget {
                         ),
                       );
                     },
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Signuppage(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFF009688),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFF009688),
-                            width: 2,
-                          ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFF009688),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF009688),
+                          width: 2,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 10,
-                          ),
-                          child: Text(
-                            "LOG IN",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: "Clarendon",
-                              fontSize: 12,
-                            ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 10,
+                        ),
+                        child: Text(
+                          "LOG IN",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: "Clarendon",
+                            fontSize: 12,
                           ),
                         ),
                       ),
@@ -134,7 +121,7 @@ class Signinpage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
-                        "Already have an account? ",
+                        "Didn't receive the code? ",
                         style: TextStyle(
                           fontSize: 12,
                           fontFamily: "MontserratEBold",
@@ -142,23 +129,13 @@ class Signinpage extends StatelessWidget {
                           color: Colors.black,
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Signuppage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          " Sign Up",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: "MontserratEBold",
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF009688),
-                          ),
+                      const Text(
+                        " Resend",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: "MontserratEBold",
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF009688),
                         ),
                       ),
                     ],

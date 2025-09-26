@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nusthackationwebsite/pages/profile.dart';
 
 class ChatbotPage extends StatefulWidget {
   const ChatbotPage({super.key});
@@ -11,14 +10,14 @@ class ChatbotPage extends StatefulWidget {
 
 class _ChatbotPageState extends State<ChatbotPage> {
   final TextEditingController _controller = TextEditingController();
-  final List<Map<String, String>> _messages = []; // store chat messages
+  final List<Map<String, String>> _messages = [];
 
   void _sendMessage() {
     if (_controller.text.trim().isEmpty) return;
 
     setState(() {
       _messages.add({"role": "user", "text": _controller.text.trim()});
-      //  echo  bot response
+      // bot response
       _messages.add({"role": "bot", "text": "This is a bot reply."});
     });
 
@@ -32,31 +31,61 @@ class _ChatbotPageState extends State<ChatbotPage> {
         child: Column(
           children: [
             // Header
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Logo
-                  Text(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Text(
                     "MESMTF",
                     style: TextStyle(
-                      fontSize: 24.sp,
-                      color: const Color(0xFF009688),
-                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                      color: Color(0xFF009688),
                       fontFamily: "BalooPaajiR",
                     ),
                   ),
-                  Row(
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Dashboard(),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              "Dashboard",
+                              style: TextStyle(
+                                fontFamily: "Clarendon",
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChatbotPage(),
+                            ),
+                          );
+                        },
                         child: Text(
-                          "Services",
+                          "Chatbot",
                           style: TextStyle(
                             fontFamily: "Clarendon",
-                            fontSize: 14.sp,
-                            color: Colors.black,
+                            fontSize: 16,
+                            color: Color(0xFF009688),
                           ),
                         ),
                       ),
@@ -66,18 +95,25 @@ class _ChatbotPageState extends State<ChatbotPage> {
                           "About Us",
                           style: TextStyle(
                             fontFamily: "Clarendon",
-                            fontSize: 14.sp,
+                            fontSize: 16,
                             color: Colors.black,
                           ),
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Contactus(),
+                            ),
+                          );
+                        },
                         child: Text(
                           "Contact",
                           style: TextStyle(
                             fontFamily: "Clarendon",
-                            fontSize: 14.sp,
+                            fontSize: 16,
                             color: Colors.black,
                           ),
                         ),
@@ -94,12 +130,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                             vertical: 10.h,
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const ProfilePage()),
-                          );
-                        },
+                        onPressed: () {},
                         child: Text(
                           "GO TO ACCOUNT",
                           style: TextStyle(
@@ -111,8 +142,8 @@ class _ChatbotPageState extends State<ChatbotPage> {
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
 
             // Chat Area
@@ -120,9 +151,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
               child: _messages.isEmpty
                   ? Center(
                       child: Text(
-                        "How Can We Help You Today",
+                        "How Can We Help You Today?",
                         style: TextStyle(
                           fontSize: 20.sp,
+                          fontFamily: "MontserratEBold",
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF009688),
                         ),
@@ -135,8 +167,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
                         final msg = _messages[index];
                         final isUser = msg["role"] == "user";
                         return Align(
-                          alignment:
-                              isUser ? Alignment.centerRight : Alignment.centerLeft,
+                          alignment: isUser
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
                           child: Container(
                             margin: EdgeInsets.symmetric(vertical: 5.h),
                             padding: EdgeInsets.symmetric(
@@ -169,12 +202,17 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(color: Color(0xFF009688), width: 2),
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12.w),
                         child: TextField(
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontFamily: "ClarendonBold",
+                          ),
                           controller: _controller,
                           decoration: const InputDecoration(
                             hintText: "Type a message...",
@@ -188,8 +226,11 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   SizedBox(width: 10.w),
                   IconButton(
                     onPressed: _sendMessage,
-                    icon: const Icon(Icons.send, color: Color(0xFF009688)),
-                  )
+                    icon: const Icon(
+                      LucideIcons.send,
+                      color: Color(0xFF009688),
+                    ),
+                  ),
                 ],
               ),
             ),
