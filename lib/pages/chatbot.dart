@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:nusthackationwebsite/pages/contactus.dart';
-import 'package:nusthackationwebsite/pages/dashboard.dart';
 
 class ChatbotPage extends StatefulWidget {
   const ChatbotPage({super.key});
@@ -20,6 +17,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
     setState(() {
       _messages.add({"role": "user", "text": _controller.text.trim()});
+      // bot response
       _messages.add({"role": "bot", "text": "This is a bot reply."});
     });
 
@@ -120,29 +118,25 @@ class _ChatbotPageState extends State<ChatbotPage> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Color(0xFF009688),
-                              borderRadius: BorderRadius.circular(60),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10,
-                              ),
-                              child: Text(
-                                "GO TO ACCOUNT",
-                                style: TextStyle(
-                                  fontFamily: "Clarendon",
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                      SizedBox(width: 20.w),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF009688),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
+                          ),
+                        ),
+                        onPressed: () {},
+                        child: Text(
+                          "GO TO ACCOUNT",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
