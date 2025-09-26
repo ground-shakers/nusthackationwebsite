@@ -252,7 +252,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 280,
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
             decoration: BoxDecoration(

@@ -1,13 +1,88 @@
-// ignore_for_file: deprecated_member_use
+import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:nusthackationwebsite/const/textfield.dart';
+import 'package:nusthackationwebsite/models/auth_model.dart';
 import 'package:nusthackationwebsite/pages/dashboard.dart';
 import 'package:nusthackationwebsite/pages/signuppage.dart';
+import 'package:nusthackationwebsite/services/api_service.dart';
+import 'package:nusthackationwebsite/services/storage_service.dart';
 
-class Signinpage extends StatelessWidget {
+class Signinpage extends StatefulWidget {
   const Signinpage({super.key});
+
+  @override
+  State<Signinpage> createState() => _SigninpageState();
+}
+
+class _SigninpageState extends State<Signinpage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool _isLoading = false;
+  String _errorMessage = '';
+
+  Future<void> _login() async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all fields';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      // 1. Create login request (NOT signup!)
+      final loginRequest = LoginRequest(
+        username: emailController.text,
+        password: passwordController.text,
+      );
+
+      print('🔐 Attempting login...');
+      print('📧 Email: ${emailController.text}');
+      print('🔐 Password: ${passwordController.text}');
+
+      // 2. Call the LOGIN API (not createPatient!)
+      final loginResponse = await ApiService.login(loginRequest);
+
+      // 3. Store the token and user data
+      await StorageService.saveLoginData(loginResponse);
+
+      // 4. Verify storage worked
+      final userData = await StorageService.getUserData();
+      print('💾 Stored user data: $userData');
+
+      // 5. Show success and navigate to dashboard
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Dashboard()),
+        );
+      }
+    } catch (e) {
+      print('❌ Login failed: $e');
+      setState(() {
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +96,19 @@ class Signinpage extends StatelessWidget {
                 'assets/images/doctors.png',
                 width: double.infinity,
                 height: double.infinity,
-                alignment: Alignment(0, -0.3),
+                alignment: const Alignment(0, -0.3),
                 fit: BoxFit.cover,
               ),
               Image.asset(
                 'assets/images/doctors2.png',
                 width: double.infinity,
                 height: double.infinity,
-                alignment: Alignment(0, -0.5),
+                alignment: const Alignment(0, -0.5),
                 fit: BoxFit.cover,
               ),
               Image.asset(
                 'assets/images/doctors3.png',
-                alignment: Alignment(0, -0.2),
+                alignment: const Alignment(0, -0.2),
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,
@@ -62,7 +137,7 @@ class Signinpage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(height: 60),
+                  const SizedBox(height: 40),
                   const Text(
                     "LOGIN YOUR ACCOUNT",
                     style: TextStyle(
@@ -72,69 +147,85 @@ class Signinpage extends StatelessWidget {
                       color: Color(0xFF009688),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
+
+                  // Error message
+                  if (_errorMessage.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        _errorMessage,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+
+                  // ✅ FIXED: Use the state controller
                   EmailTextField(
-                    controller: TextEditingController(),
+                    controller: emailController,
                     hintText: "Email Address",
                   ),
                   const SizedBox(height: 6),
+
+                  // ✅ FIXED: Use the state controller
                   PasswordTextField(
-                    controller: TextEditingController(),
+                    controller: passwordController,
                     hintText: "Password",
                   ),
                   const SizedBox(height: 40),
+
+                  // ✅ FIXED: Removed duplicate GestureDetector
                   GestureDetector(
-                    onTap: () {
-                      // Navigate to the dashboard page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Dashboard(),
+                    onTap: _isLoading ? null : _login,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _isLoading
+                            ? Colors.grey
+                            : const Color(0xFF009688),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF009688),
+                          width: 2,
                         ),
-                      );
-                    },
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Signuppage(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFF009688),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFF009688),
-                            width: 2,
-                          ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 10,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 30,
-                            vertical: 10,
-                          ),
-                          child: Text(
-                            "LOG IN",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: "Clarendon",
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const Text(
+                                "LOG IN",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "MontserratEBold",
+                                  fontSize: 16,
+                                ),
+                              ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
-                        "Already have an account? ",
+                        "Don't have an account? ",
                         style: TextStyle(
                           fontSize: 12,
                           fontFamily: "MontserratEBold",
@@ -143,21 +234,25 @@ class Signinpage extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Signuppage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
+                        onTap: _isLoading
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Signuppage(),
+                                  ),
+                                );
+                              },
+                        child: Text(
                           " Sign Up",
                           style: TextStyle(
                             fontSize: 12,
                             fontFamily: "MontserratEBold",
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF009688),
+                            color: _isLoading
+                                ? Colors.grey
+                                : const Color(0xFF009688),
                           ),
                         ),
                       ),
@@ -170,5 +265,12 @@ class Signinpage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }
