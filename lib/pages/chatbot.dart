@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nusthackationwebsite/pages/profile.dart';
 
 class ChatbotPage extends StatefulWidget {
   const ChatbotPage({super.key});
@@ -17,7 +18,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
     setState(() {
       _messages.add({"role": "user", "text": _controller.text.trim()});
-      // bot response
+      //  echo  bot response
       _messages.add({"role": "bot", "text": "This is a bot reply."});
     });
 
@@ -93,7 +94,12 @@ class _ChatbotPageState extends State<ChatbotPage> {
                             vertical: 10.h,
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ProfilePage()),
+                          );
+                        },
                         child: Text(
                           "GO TO ACCOUNT",
                           style: TextStyle(
