@@ -5,6 +5,7 @@ import 'package:nusthackationwebsite/const/calender.dart';
 import 'package:nusthackationwebsite/const/heartrategraph.dart';
 import 'package:nusthackationwebsite/pages/chatbot.dart';
 import 'package:nusthackationwebsite/pages/contactus.dart';
+import 'package:nusthackationwebsite/pages/profile.dart';
 import 'package:nusthackationwebsite/services/api_service.dart';
 import 'package:nusthackationwebsite/services/storage_service.dart';
 import 'package:nusthackationwebsite/models/patient_model.dart';
@@ -189,7 +190,14 @@ class _DashboardState extends State<Dashboard> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfilePage(),
+                          ),
+                        );
+                      },
                       child: Container(
                         decoration: BoxDecoration(
                           color: Color(0xFF009688),

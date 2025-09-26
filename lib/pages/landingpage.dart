@@ -4,7 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:nusthackationwebsite/const/animatetime.dart';
 import 'package:nusthackationwebsite/const/textfield.dart';
-import 'package:nusthackationwebsite/pages/signuppage.dart';
+import 'package:nusthackationwebsite/pages/accounttype.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class DesktopHome extends StatefulWidget {
@@ -332,7 +332,7 @@ class _DesktopHomeState extends State<DesktopHome> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const Signuppage()),
+              MaterialPageRoute(builder: (context) => const Accounttype()),
             );
           },
           child: Container(
@@ -379,7 +379,7 @@ class _DesktopHomeState extends State<DesktopHome> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Signuppage()),
+                  MaterialPageRoute(builder: (context) => const Accounttype()),
                 );
               },
               child: Container(

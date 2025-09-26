@@ -12,9 +12,6 @@ class StorageService {
     await prefs.setString(_accessTokenKey, response.token.accessToken);
     await prefs.setString(_userIdKey, response.userId);
     await prefs.setString(_userRoleKey, response.role);
-
-    // You might want to store email too for display purposes
-    // await prefs.setString(_userEmailKey, response.email); // If available
   }
 
   static Future<String?> getAccessToken() async {
@@ -50,7 +47,6 @@ class StorageService {
     return token != null && token.isNotEmpty;
   }
 
-  // Get all user data for debugging
   static Future<Map<String, String?>> getUserData() async {
     final prefs = await SharedPreferences.getInstance();
     return {

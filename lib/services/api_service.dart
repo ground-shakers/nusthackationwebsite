@@ -13,11 +13,6 @@ class ApiService {
     final url = Uri.parse('$baseUrl/api/v1/patients/$patientId');
 
     try {
-      print('👤 === FETCH PATIENT PROFILE ===');
-      print('URL: $url');
-      print('Patient ID: $patientId');
-      print('========================');
-
       final response = await http.get(
         url,
         headers: {
@@ -25,11 +20,6 @@ class ApiService {
           'Content-Type': 'application/json',
         },
       );
-
-      print('👤 === PATIENT PROFILE RESPONSE ===');
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-      print('========================');
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -42,7 +32,6 @@ class ApiService {
         );
       }
     } catch (e) {
-      print('❌ Patient profile fetch error: $e');
       throw Exception('Patient profile fetch error: $e');
     }
   }
@@ -90,38 +79,14 @@ class ApiService {
     final url = Uri.parse('$baseUrl/api/v1/patients');
 
     try {
-      // Convert request to JSON
       final requestBody = request.toJson();
       final jsonString = json.encode(requestBody);
-
-      // Detailed printing
-      print('🚀 === API REQUEST DETAILS ===');
-      print('📍 URL: $url');
-      print('📋 METHOD: POST');
-      print('🔗 ENDPOINT: /api/v1/patients');
-      print('📦 HEADERS: {"Content-Type": "application/json"}');
-      print('');
-      print('📊 REQUEST BODY STRUCTURE:');
-      _printRequestBody(requestBody);
-      print('');
-      print('📨 RAW JSON BEING SENT:');
-      print(jsonString);
-      print('================================');
-      print('');
 
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonString,
       );
-
-      print('📡 === API RESPONSE ===');
-      print('📟 STATUS CODE: ${response.statusCode}');
-      print('📄 RESPONSE BODY:');
-      print(response.body);
-      print('📎 RESPONSE HEADERS: ${response.headers}');
-      print('========================');
-      print('');
 
       if (response.statusCode == 201) {
         final jsonResponse = json.decode(response.body);
@@ -137,26 +102,7 @@ class ApiService {
         );
       }
     } catch (e) {
-      print('❌ === API ERROR ===');
-      print('💥 Error type: ${e.runtimeType}');
-      print('💥 Error message: $e');
-      print('====================');
       throw Exception('Network error: $e');
     }
-  }
-
-  // Helper method to print the request body in a structured way
-  static void _printRequestBody(Map<String, dynamic> requestBody) {
-    requestBody.forEach((key, value) {
-      if (value is Map<String, dynamic>) {
-        print('  📍 $key: {');
-        value.forEach((nestedKey, nestedValue) {
-          print('    🏷️  $nestedKey: $nestedValue');
-        });
-        print('  }');
-      } else {
-        print('  🏷️  $key: $value');
-      }
-    });
   }
 }

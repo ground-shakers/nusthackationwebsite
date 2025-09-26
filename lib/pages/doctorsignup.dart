@@ -8,14 +8,14 @@ import 'package:nusthackationwebsite/services/api_service.dart';
 import 'package:nusthackationwebsite/pages/signinpage.dart';
 import 'package:nusthackationwebsite/services/storage_service.dart';
 
-class Signuppage extends StatefulWidget {
-  const Signuppage({super.key});
+class Doctorsignup extends StatefulWidget {
+  const Doctorsignup({super.key});
 
   @override
-  State<Signuppage> createState() => _SignuppageState();
+  State<Doctorsignup> createState() => _DoctorsignupState();
 }
 
-class _SignuppageState extends State<Signuppage> {
+class _DoctorsignupState extends State<Doctorsignup> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
