@@ -1,140 +1,140 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nusthackationwebsite/const/textfield.dart';
 import 'package:nusthackationwebsite/pages/chatbot.dart';
 import 'package:nusthackationwebsite/pages/dashboard.dart';
 
 class Contactus extends StatefulWidget {
-  const Contactus({super.key});
+  final String userId;
+
+  const Contactus({super.key, required this.userId});
 
   @override
   State<Contactus> createState() => _ContactusState();
 }
 
 class _ContactusState extends State<Contactus> {
+  late final String userId;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Text(
-                  "MESMTF",
-                  style: TextStyle(
-                    fontSize: 40,
-                    color: Color(0xFF009688),
-                    fontFamily: "BalooPaajiR",
+          //Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "MESMTF",
+                    style: TextStyle(
+                      fontSize: 40,
+                      color: Color(0xFF009688),
+                      fontFamily: "BalooPaajiR",
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Dashboard(),
-                          ),
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          Text(
-                            "Dashboard",
-                            style: TextStyle(
-                              fontFamily: "Clarendon",
-                              fontSize: 16,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
+                Spacer(),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Dashboard(),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ChatbotPage(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        "Chatbot",
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Text(
+                        "Dashboard",
                         style: TextStyle(
                           fontFamily: "Clarendon",
                           fontSize: 16,
                           color: Colors.black,
                         ),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "About Us",
-                        style: TextStyle(
-                          fontFamily: "Clarendon",
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Contactus(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        "Contact",
-                        style: TextStyle(
-                          fontFamily: "Clarendon",
-                          fontSize: 16,
-                          color: Color(0xFF009688),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFF009688),
-                            borderRadius: BorderRadius.circular(60),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                            child: Text(
-                              "GO TO ACCOUNT",
-                              style: TextStyle(
-                                fontFamily: "Clarendon",
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatbotPage(userId: userId),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "AI Diagnosis",
+                    style: TextStyle(
+                      fontFamily: "Clarendon",
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Contactus(userId: userId),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Contact",
+                    style: TextStyle(
+                      fontFamily: "Clarendon",
+                      fontSize: 16,
+                      color: Color(0xFF009688),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFF009688),
+                        borderRadius: BorderRadius.circular(60),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        child: Text(
+                          "GO TO ACCOUNT",
+                          style: TextStyle(
+                            fontFamily: "Clarendon",
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+              ],
+            ),
           ),
 
           SizedBox(height: 60),

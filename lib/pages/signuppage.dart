@@ -5,7 +5,6 @@ import 'package:nusthackationwebsite/models/auth_model.dart';
 import 'package:nusthackationwebsite/models/patient_model.dart';
 import 'package:nusthackationwebsite/pages/dashboard.dart';
 import 'package:nusthackationwebsite/services/api_service.dart';
-import 'package:nusthackationwebsite/pages/codepage.dart';
 import 'package:nusthackationwebsite/pages/signinpage.dart';
 import 'package:nusthackationwebsite/services/storage_service.dart';
 
