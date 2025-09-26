@@ -33,7 +33,7 @@ class _DoctorDashboardPageState extends State<DoctorDashboardPage> {
                 children: [
                   const CircleAvatar(
                     radius: 32,
-                    backgroundImage: AssetImage("assets/doctor.png"), // replace with network or asset
+                    backgroundImage: AssetImage("assets/doctor.png"),
                   ),
                   const SizedBox(width: 16),
                   Column(
