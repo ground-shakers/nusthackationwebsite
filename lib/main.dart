@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nusthackationwebsite/pages/chatbot.dart';
 //import 'package:nusthackationwebsite/pages/chatbot.dart';
 import 'package:nusthackationwebsite/pages/dashboard.dart';
+import 'package:nusthackationwebsite/pages/doctordashboard.dart';
 //import 'package:nusthackationwebsite/pages/dashboard.dart';
 //import 'package:nusthackationwebsite/pages/landingpage.dart';
 
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Medical Expert System for Malaria & Typhoid Fever',
           theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-          home: const ChatbotPage(),
+          home: const DoctorDashboardPage(),
           restorationScopeId: 'app',
         );
       },
