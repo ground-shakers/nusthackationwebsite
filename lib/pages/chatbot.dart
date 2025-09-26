@@ -373,17 +373,6 @@ class _ChatbotPageState extends State<ChatbotPage> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      "About Us",
-                      style: TextStyle(
-                        fontFamily: "Clarendon",
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,

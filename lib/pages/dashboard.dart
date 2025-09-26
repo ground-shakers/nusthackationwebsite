@@ -30,7 +30,6 @@ class _DashboardState extends State<Dashboard> {
 
   Future<void> _loadPatientData() async {
     try {
-      // Get stored user data
       final token = await StorageService.getAccessToken();
       final userId = await StorageService.getUserId();
 
@@ -58,7 +57,7 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  // Calculate age from birth details
+  // Age Calculation
   int _calculateAge() {
     if (_patient == null) return 0;
 
@@ -88,7 +87,7 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  // Format gender for display
+  // Gender Formatting
   String _formatGender() {
     if (_patient == null) return '';
     return _patient!.gender[0].toUpperCase() + _patient!.gender.substring(1);
@@ -100,7 +99,7 @@ class _DashboardState extends State<Dashboard> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header (unchanged)
+            // Header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -162,17 +161,6 @@ class _DashboardState extends State<Dashboard> {
                     },
                     child: Text(
                       "AI Diagnosis",
-                      style: TextStyle(
-                        fontFamily: "Clarendon",
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      "About Us",
                       style: TextStyle(
                         fontFamily: "Clarendon",
                         fontSize: 16,

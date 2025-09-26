@@ -90,17 +90,6 @@ class _ContactusState extends State<Contactus> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "About Us",
-                    style: TextStyle(
-                      fontFamily: "Clarendon",
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
