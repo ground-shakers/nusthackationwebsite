@@ -4,9 +4,11 @@ import 'package:lottie/lottie.dart';
 import 'package:nusthackationwebsite/const/calender.dart';
 import 'package:nusthackationwebsite/const/heartrategraph.dart';
 import 'package:nusthackationwebsite/pages/chatbot.dart';
+import 'package:nusthackationwebsite/pages/contactus.dart';
 import 'package:nusthackationwebsite/services/api_service.dart';
 import 'package:nusthackationwebsite/services/storage_service.dart';
 import 'package:nusthackationwebsite/models/patient_model.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -59,18 +61,31 @@ class _DashboardState extends State<Dashboard> {
   // Calculate age from birth details
   int _calculateAge() {
     if (_patient == null) return 0;
-    final now = DateTime.now();
-    final birthDate = DateTime(
-      _patient!.birthDetails.year,
-      _patient!.birthDetails.month,
-      _patient!.birthDetails.day,
-    );
-    return now.year -
-        birthDate.year -
-        (now.month > birthDate.month ||
-                (now.month == birthDate.month && now.day >= birthDate.day)
-            ? 0
-            : 1);
+
+    try {
+      final now = DateTime.now();
+      final birthDate = DateTime(
+        _patient!.birthDetails.year,
+        _patient!.birthDetails.month,
+        _patient!.birthDetails.day,
+      );
+
+      // Validate that birthdate is not in the future
+      if (birthDate.isAfter(now)) return 0;
+
+      int age = now.year - birthDate.year;
+
+      // Adjust age if birthday hasn't occurred yet this year
+      if (now.month < birthDate.month ||
+          (now.month == birthDate.month && now.day < birthDate.day)) {
+        age--;
+      }
+
+      return age;
+    } catch (e) {
+      // Handle potential DateTime exceptions
+      return 0;
+    }
   }
 
   // Format gender for display
@@ -140,12 +155,13 @@ class _DashboardState extends State<Dashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ChatbotPage(),
+                          builder: (context) =>
+                              ChatbotPage(userId: _patient!.id),
                         ),
                       );
                     },
                     child: Text(
-                      "Chatbot",
+                      "AI Diagnosis",
                       style: TextStyle(
                         fontFamily: "Clarendon",
                         fontSize: 16,
@@ -169,7 +185,7 @@ class _DashboardState extends State<Dashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ChatbotPage(),
+                          builder: (context) => Contactus(userId: _patient!.id),
                         ),
                       );
                     },
@@ -222,11 +238,10 @@ class _DashboardState extends State<Dashboard> {
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        // Row 1 - Patient Info with REAL DATA
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            // Patient Profile Card with REAL DATA
+                            //User Info Card
                             Container(
                               width: 450.w,
                               height: 150.h,
@@ -258,17 +273,25 @@ class _DashboardState extends State<Dashboard> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          "${_patient!.firstName} ${_patient!.lastName}"
-                                              .toUpperCase(),
-                                          style: TextStyle(
-                                            fontFamily: "ClarendonBold",
-                                            fontSize: 26,
-                                            color: Colors.white,
+                                        SizedBox(
+                                          width: 300,
+                                          child: TextScroll(
+                                            "${_patient!.firstName} ${_patient!.lastName}"
+                                                .toUpperCase(),
+                                            velocity: Velocity(
+                                              pixelsPerSecond: Offset(20, 0),
+                                            ),
+                                            intervalSpaces: 10,
+                                            delayBefore: Duration(seconds: 1),
+                                            style: TextStyle(
+                                              fontFamily: "ClarendonBold",
+                                              fontSize: 26,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                         Text(
-                                          "$_calculateAge() Years Old, $_formatGender()",
+                                          "${_calculateAge()} Years Old, ${_formatGender()}",
                                           style: TextStyle(
                                             fontFamily: "MontserratEBold",
                                             fontSize: 14,
@@ -296,7 +319,7 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
 
-                            // Motivation Card (unchanged)
+                            // Motivation Card
                             Container(
                               width: 450.w,
                               height: 150.h,
@@ -306,7 +329,7 @@ class _DashboardState extends State<Dashboard> {
                               ),
                               child: Center(
                                 child: Text(
-                                  "Today is worse but tomorrow will be better",
+                                  "The greatest wealth is health",
                                   style: TextStyle(
                                     fontFamily: "MontserratEBold",
                                     fontSize: 14,
@@ -317,7 +340,7 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
 
-                            // Additional Info Card (unchanged)
+                            // Additional Info Card
                             Container(
                               width: 450.w,
                               height: 150.h,
@@ -325,37 +348,60 @@ class _DashboardState extends State<Dashboard> {
                                 borderRadius: BorderRadius.circular(30),
                                 color: Color(0xFF009688),
                               ),
-                              // Add more patient info here if needed
                               child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Patient ID",
-                                      style: TextStyle(
-                                        fontFamily: "MontserratEBold",
-                                        fontSize: 14,
-                                        color: Colors.white.withOpacity(0.8),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 20,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          "Patient ID:",
+                                          style: TextStyle(
+                                            fontFamily: "MontserratEBold",
+                                            fontSize: 14,
+                                            height: 0.6,
+                                            color: Colors.white.withOpacity(
+                                              0.8,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      _patient!.id.substring(0, 8) + "...",
-                                      style: TextStyle(
-                                        fontFamily: "ClarendonBold",
-                                        fontSize: 16,
-                                        color: Colors.white,
+                                      Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          "${_patient!.id.substring(0, 12)}...",
+                                          style: TextStyle(
+                                            fontFamily: "ClarendonBold",
+                                            fontSize: 24,
+                                            height: 1,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    Text(
-                                      "Phone: ${_patient!.contactInfo.phone}",
-                                      style: TextStyle(
-                                        fontFamily: "MontserratEBold",
-                                        fontSize: 12,
-                                        color: Colors.white.withOpacity(0.8),
+                                      SizedBox(height: 10.h),
+                                      Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          "Phone: ${_patient!.contactInfo.phone}",
+                                          style: TextStyle(
+                                            fontFamily: "MontserratEBold",
+                                            fontSize: 14,
+                                            height: 0.6,
+                                            color: Colors.white.withOpacity(
+                                              0.8,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -370,10 +416,9 @@ class _DashboardState extends State<Dashboard> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // Calendar Container
                               Container(
                                 width: 450.w,
-                                height: 500.h,
+                                height: 740.h,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(30),
                                   color: Color(0xFF009688),
@@ -399,7 +444,7 @@ class _DashboardState extends State<Dashboard> {
                                     ),
                                     SizedBox(
                                       width: 380.w,
-                                      height: 380.h,
+                                      height: 580.h,
                                       child: Padding(
                                         padding: const EdgeInsets.all(12.0),
                                         child: CalendarPage(),
