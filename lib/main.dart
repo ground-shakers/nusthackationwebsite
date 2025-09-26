@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nusthackationwebsite/authchecker.dart';
-import 'package:nusthackationwebsite/pages/landingpage.dart';
 
 void main() {
   runApp(const MyApp());
