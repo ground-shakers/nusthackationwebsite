@@ -5,6 +5,7 @@ import 'package:nusthackationwebsite/const/calender.dart';
 import 'package:nusthackationwebsite/const/heartrategraph.dart';
 import 'package:nusthackationwebsite/pages/chatbot.dart';
 import 'package:nusthackationwebsite/pages/contactus.dart';
+import 'package:nusthackationwebsite/pages/landingpage.dart';
 import 'package:nusthackationwebsite/pages/profile.dart';
 import 'package:nusthackationwebsite/services/api_service.dart';
 import 'package:nusthackationwebsite/services/storage_service.dart';
@@ -116,14 +117,24 @@ class _DashboardState extends State<Dashboard> {
               ),
               child: Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      "MESMTF",
-                      style: TextStyle(
-                        fontSize: 40,
-                        color: Color(0xFF009688),
-                        fontFamily: "BalooPaajiR",
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DesktopHome(),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        "MESMTF",
+                        style: TextStyle(
+                          fontSize: 40,
+                          color: Color(0xFF009688),
+                          fontFamily: "BalooPaajiR",
+                        ),
                       ),
                     ),
                   ),
